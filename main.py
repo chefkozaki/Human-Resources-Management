@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import List, Optional, overload
 
 class Employee(ABC):
-    # --- NẠP CHỒNG CONSTRUCTOR ---
+    #Nạp chồng Constructor
     @overload
     def __init__(self, employee_id: str, full_name: str) -> None: ...
     @overload
@@ -17,7 +17,6 @@ class Employee(ABC):
         else:
             raise ValueError("Constructor yêu cầu 2 hoặc 3 tham số.")
 
-        # Bất biến - quy tắc
         if not employee_id.strip():
             raise ValueError("Mã nhân sự không rỗng.")
         if not full_name.strip():
@@ -30,7 +29,6 @@ class Employee(ABC):
         self._department = department
         self._monthly_bonus = 0.0
         
-        # Quyết định: Lưu lịch sử thưởng thay vì chỉ mảng song song để minh bạch kế toán
         self._bonus_history = [] 
 
     @property
@@ -42,7 +40,7 @@ class Employee(ABC):
     @property
     def monthly_bonus(self) -> float: return self._monthly_bonus
 
-    # --- NẠP CHỒNG PHƯƠNG THỨC THƯỞNG ---
+    #Nạp chồng phương thức thưởng
     @overload
     def add_bonus(self, amount: float) -> None: ...
     @overload
@@ -55,25 +53,22 @@ class Employee(ABC):
         reason = "Không có lý do"
 
         if len(args) == 1:
-            # addBonus(amount)
             amount = args[0]
             if amount <= 0: raise ValueError("Khoản thưởng phải lớn hơn 0.")
         
         elif len(args) == 2:
-            # addBonus(amount, reason)
             amount, reason = args
             if amount <= 0: raise ValueError("Khoản thưởng phải lớn hơn 0.")
             if not reason.strip(): raise ValueError("Nội dung lý do không được rỗng.")
             
         elif len(args) == 3:
-            # addBonus(rate, referenceAmount, reason)
             rate, reference_amount, reason = args
-            if not (0 < rate <= 0.5): raise ValueError("Tỷ lệ thưởng (rate) phải > 0 và <= 0.5.")
+            if not (0 < rate <= 0.5): raise ValueError("Tỷ lệ thưởng phải > 0 và <= 0.5.")
             if reference_amount <= 0: raise ValueError("Giá trị tham chiếu phải > 0.")
             if not reason.strip(): raise ValueError("Nội dung lý do không được rỗng.")
             amount = rate * reference_amount
         else:
-            raise ValueError("Số lượng tham số truyền vào addBonus không hợp lệ.")
+            raise ValueError("Số lượng tham số không hợp lệ")
 
         self._monthly_bonus += amount
         self._bonus_history.append({"amount": amount, "reason": reason})
@@ -163,7 +158,6 @@ class Payroll:
     def find_highest_paid_employee(self) -> Optional[Employee]:
         if not self.employee_list:
             return None
-        # Lời gọi đa hình calculate_gross_pay()
         return max(self.employee_list, key=lambda emp: emp.calculate_gross_pay())
 
     def display_payroll(self):
@@ -176,9 +170,7 @@ class Payroll:
         print("-" * 50)
         print(f"Tổng quỹ lương: {self.calculate_total_payroll():,.0f}")
 
-# ==========================================
-# C: DỮ LIỆU KIỂM THỬ THEO ĐỀ BÀI
-# ==========================================
+#Kiểm thử
 if __name__ == "__main__":
     payroll = Payroll("2026-09")
 
@@ -201,8 +193,7 @@ if __name__ == "__main__":
     e4 = SalesEmployee("E004", "Phạm Quốc Dũng", "Kinh doanh", 8000000, 200000000, 0.05)
     e4.add_bonus(0.02, 50000000, "Đạt mốc doanh thu phụ") # Gọi addBonus(rate, referenceAmount, reason)
     payroll.add_employee(e4)
-
-    # --- IN KẾT QUẢ KIỂM THỬ ---
+    
     payroll.display_payroll()
     print(f"Tổng của phòng Hỗ trợ: {payroll.calculate_payroll_by_department('Hỗ trợ'):,.0f}")
     
